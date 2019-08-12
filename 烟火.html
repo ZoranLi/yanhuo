@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <style>
         html,
         body {
@@ -43,6 +44,11 @@
             -webkit-text-fill-color: transparent;
         }
 
+        .bottom_container {
+            position: absolute;
+            bottom: 20px;
+        }
+
         .cmusic {
             position: fixed !important;
             width: 92px;
@@ -76,6 +82,20 @@
 <body>
 <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.1.js"></script>
 <div id="jsi-sphere-container" class="container"></div>
+<div class="bottom_container">
+     <span id="days">
+        days
+    </span>
+    <div id="hours">
+        hours
+    </div>
+    <span id="minutes">
+        minutes
+    </span>
+    <span id="seconds">
+        seconds
+    </span>
+</div>
 <div class="top_container">
     <span id="tips">
     </span>
