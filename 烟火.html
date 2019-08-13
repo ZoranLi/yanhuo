@@ -35,6 +35,7 @@
             left: 0;
             width: 100%;
             text-align: center;
+            display: none;
         }
 
         .top_container span {
@@ -42,11 +43,6 @@
             background: linear-gradient(270deg, rgba(245, 144, 173, 1) 0%, rgba(215, 55, 255, 1) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-        }
-
-        .bottom_container {
-            position: absolute;
-            bottom: 20px;
         }
 
         .cmusic {
@@ -77,35 +73,91 @@
                 transform: rotate(360deg);
             }
         }
+
+        .am_desc {
+            animation: show_desc 1s ease-out
+        }
+
+        @keyframes show_desc {
+            0% {
+                margin-top: 15px;
+                opacity: 0
+            }
+            100% {
+                margin-top: 0;
+                opacity: 1
+            }
+        }
+
+        .content_container {
+            position: absolute;
+            top: 20px;
+            color: white;
+        }
+
+        .desc i {
+            font-weight: bold;
+            color: #f3314b
+        }
+
+        .desc p {
+            height: 30px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 28px;
+            line-height: 30px;
+            text-align: center;
+            background: linear-gradient(270deg, rgba(245, 144, 173, 1) 0%, rgba(215, 55, 255, 1) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .desc p .large_price {
+            font-size: 36px
+        }
+
+        .serif {
+            font-family: 'songti', serif
+        }
+
+        .desc span {
+            display: block;
+            height: 30px
+        }
+
+        .hide {
+            display: none
+        }
     </style>
 </head>
 <body>
 <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.1.js"></script>
 <div id="jsi-sphere-container" class="container"></div>
-<div class="bottom_container">
-     <span id="days">
-        days
-    </span>
-    <div id="hours">
-        hours
-    </div>
-    <span id="minutes">
-        minutes
-    </span>
-    <span id="seconds">
-        seconds
-    </span>
-</div>
 <div class="top_container">
     <span id="tips">
     </span>
 </div>
-
 <div class="cmusic">
     <audio id='music' controls hidden preload loop="loop">
         <source src="https://wvcdn.xiaohongchun.com/mp3/1565613167550_7bQ8xjKks5.mp3" type="audio/mpeg">
     </audio>
 </div>
+<div class="content_container">
+    <div class="desc">
+        <p class="js_animate" data-animate="am_desc" data-time="300">***</p>
+        <p id="meet_days" class="js_animate" data-animate="am_desc" data-time="800"></p>
+        <p class="js_animate" data-animate="am_desc" data-time="1300">很开心遇见你</p>
+        <span class="js_animate" data-animate="am_desc" data-time="1800"></span>
+        <p class="js_animate" data-animate="am_desc" data-time="2300">在2019年6月1日</p>
+        <p class="js_animate" data-animate="am_desc" data-time="2800">你悄悄地走进了**的世界</p>
+        <p id="acquaintance_seconds" class="js_animate" data-animate="am_desc" data-time="3300"></p>
+        <span class="js_animate" data-animate="am_desc" data-time="3800"></span>
+        <p class="js_animate serif" data-animate="am_desc" data-time="4300">不经意间</p>
+        <p class="js_animate serif" data-animate="am_desc" data-time="5800">**已经成为一种习惯</p><!--想你-->
+    </div>
+</div>
+
 <script src="lib/anime.min.js"></script>
 <script src="lib/parallax.js"></script>
 
@@ -124,32 +176,57 @@
             this.reconstructMethod();
             this.bindEvent();
             this.render();
+            this.initMusic();
+            this.initPhase();
+        },
+        initPhase() {
+            //初始化话
+            let animateQueue = [];
+            let forEach = [].forEach;
+            forEach.call(document.querySelectorAll('.js_animate'), function (v) {
+                v.classList.remove(v.dataset['animate']);
+                v.classList.add('hide');
+            });
+            forEach.call(document.querySelectorAll('.js_animate'), function (v) {
+                let time = v.dataset.time;
+                animateQueue.push(setTimeout(function () {
+                    v.classList.add(v.dataset['animate']);
+                    v.classList.remove('hide');
+                }, time));
+            })
+
+            let meet_daysElement = document.getElementById('meet_days')
+            let acquaintanceElement = document.getElementById('acquaintance_seconds')
+
+            acquaintanceElement.innerHTML = this.currentFormatSeconds()
+            setInterval(() => {
+                acquaintanceElement.innerHTML = this.currentFormatSeconds()
+                meet_daysElement.innerHTML = this.currentFormatDays()
+            }, 1000)
+
+        },
+        initMusic() {
             var MUSIC_PALY = true;
             var music = $('#music');
             var cmusic = $('.cmusic');
-
             function autoPlayAudio() {
                 if (music) {
                     cmusic.removeClass('music_stop').addClass('music_play')
                     music[0].play();
                 }
             }
-
             try {
                 autoPlayAudio()
             } catch (e) {
                 console.log(e)
             }
-
             function stopAudio() {
                 if (music) {
                     cmusic.addClass('music_stop').removeClass('music_play')
                     music[0].pause();
                 }
             }
-
             document.addEventListener("touchstart", autoPlayAudio, false);
-
             cmusic.click(function () {
                 if (MUSIC_PALY) {
                     MUSIC_PALY = false
@@ -168,10 +245,20 @@
             let seconds = parseInt((mss % (1000 * 60)) / 1000);
             return days + " 天 " + hours + " 小时 " + minutes + " 分钟 " + seconds + " 秒 "
         },
+        currentFormatDays() {
+            let mss = new Date().getTime() - new Date('2019/06/01').getTime();
+            let days = parseInt(mss / (1000 * 60 * 60 * 24));
+            return `和**相识已经${days}天了`
+        },
+        currentFormatSeconds() {
+            let mss = new Date().getTime() - new Date('2019/06/01').getTime();
+            let formatW = parseInt(mss / 1000 / 10000);
+            let formatQ = parseInt(mss / 1000 % 10000);
+            return `xianglian已经${formatW}万${formatQ} 秒 `
+        },
         animateOne(tipsElement) {
             anime({
                 targets: tipsElement,
-                // innerHTML: [0, new Date().getTime()],
                 innerHTML: ['0', this.currentFormatTime()],
                 easing: 'linear',
                 round: 10, // Will round the animated value to 1 decimal
@@ -218,18 +305,9 @@
             var tipsElement = document.getElementById('tips')
             setInterval(() => {
                 let mss = new Date().getTime() - new Date('2019/06/01').getTime();
-                // if (mss % 10000===0) {
-                //     this.animateOne(tipsElement)
-                // }
-                // if (mss % 5000===0) {
-                //     this.animateOne(tipsElement)
-                // }
                 tipsElement.innerHTML = this.currentFormatTime()
-                // this.animateTwo(tipsElement);
             }, 1000)
-
             this.animateOne(tipsElement)
-
         },
         setParameters: function () {
             this.$document = $(document);
@@ -360,12 +438,12 @@
             this.angle.z += deltaZ;
         },
         getCompensatedParameters: function (point) {
-            var denominator = point.z - this.z;
+            let denominator = point.z - this.z;
 
             if (denominator <= this.OFFSET) {
                 return null;
             }
-            var scale = this.FOCUS_DISTANCE / denominator,
+            let scale = this.FOCUS_DISTANCE / denominator,
                 luminance = Math.min(80, scale * 250),
                 x = this.renderer.width / 2 + (point.x + this.x) * scale,
                 y = this.renderer.height / 2 - (point.y + this.y) * scale,
